@@ -50,7 +50,9 @@ class TextHandler(BaseQuestionHandler):
             # Standard Text Input specifics
             if answer == "":
                 if 'experience' in label_lower or 'years' in label_lower:
-                    answer = str(questions_data.years_of_experience)
+                    base_years = int(questions_data.years_of_experience)
+                    extra_year = 1 if questions_data.additional_months_of_experience >= 6 else 0
+                    answer = str(base_years + extra_year)
                 elif 'phone' in label_lower or 'mobile' in label_lower:
                     answer = personal_data.phone_number
                 elif 'street' in label_lower:

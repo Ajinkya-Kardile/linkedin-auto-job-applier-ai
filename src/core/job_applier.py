@@ -114,19 +114,33 @@ class JobApplier:
             return False
 
     def answer_questions(self, modal, job_description):
+        from selenium.common.exceptions import StaleElementReferenceException
         questions_list = set()
-        all_questions = modal.find_elements(By.XPATH, ".//div[@data-test-form-element]")
-
-        for question in all_questions:
-            handled = False
-            for handler in self.handlers:
-                if handler.can_handle(question):
-                    label, answer, q_type = handler.handle(question, job_description)
-                    questions_list.add((label, answer, q_type))
-                    handled = True
+        num_questions = len(modal.find_elements(By.XPATH, ".//div[@data-test-form-element]"))
+        for i in range(num_questions):
+            try:
+                current_questions = modal.find_elements(By.XPATH, ".//div[@data-test-form-element]")
+                if i >= len(current_questions):
                     break
-            if not handled:
-                logger.warning("Encountered an unknown question type! Skipping.")
+                question = current_questions[i]
+
+                handled = False
+                for handler in self.handlers:
+                    if handler.can_handle(question):
+                        label, answer, q_type = handler.handle(question, job_description)
+                        questions_list.add((label, answer, q_type))
+                        handled = True
+                        break
+
+                if not handled:
+                    logger.warning(f"Encountered an unknown question type at index {i}! Skipping.")
+
+            except StaleElementReferenceException:
+                logger.warning(f"Question at index {i} went stale. LinkedIn re-rendered the DOM. Retrying or skipping.")
+                continue  # Safely continue to the next question instead of crashing
+            except Exception as e:
+                logger.error(f"Unexpected error answering question at index {i}: {e}")
+
         return questions_list
 
     def _upload_resume(self, modal, resume_path: str) -> tuple[bool, str]:

@@ -26,19 +26,34 @@ class DOMInteractor:
 
     def human_click(self, element: WebElement):
         """Simulates a human mouse movement, slight pause, and click."""
+        from selenium.common.exceptions import MoveTargetOutOfBoundsException, StaleElementReferenceException, \
+            ElementClickInterceptedException
+
         try:
             # Move cursor to element to trigger hover states
             self.actions.move_to_element(element).perform()
         except MoveTargetOutOfBoundsException:
-            # Fallback if standard move fails (e.g., sticky headers blocking the view)
+            # Fallback if standard move fails
             self.scroll_to_view(element)
-            self.actions.move_to_element(element).perform()
+            try:
+                self.actions.move_to_element(element).perform()
+            except Exception:
+                pass
         except Exception as e:
             logger.debug(f"ActionChains move_to_element failed: {e}")
 
         # Micro-pause simulating human reaction time before clicking
-        self.sleep_buffer(1, 2)
-        element.click()
+        self.sleep_buffer(0.5, 1.5)
+
+        try:
+            element.click()
+        except StaleElementReferenceException:
+            logger.warning("Element went stale during the human pause. The UI likely updated.")
+        except ElementClickInterceptedException:
+            # If a sticky header/footer blocks the click, force it via JavaScript
+            logger.debug("Click intercepted by an overlapping element. Using JS fallback.")
+            self.driver.execute_script("arguments[0].click();", element)
+
 
     def human_type(self, element: WebElement, text: str):
         """Simulates human typing with variable keystroke delays."""
