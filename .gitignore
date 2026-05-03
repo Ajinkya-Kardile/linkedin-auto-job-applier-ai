@@ -49,6 +49,7 @@ logs/
 debug.log
 all excels/
 all resumes/
+temp_profile
 
 # ----------------------
 # Jupyter Notebook
