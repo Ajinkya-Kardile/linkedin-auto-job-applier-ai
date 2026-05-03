@@ -4,10 +4,9 @@ from selenium.webdriver.remote.webelement import WebElement
 
 
 class BaseQuestionHandler(ABC):
-    def __init__(self, scraper, ai_manager, user_data):
+    def __init__(self, scraper, ai_manager):
         self.scraper = scraper
         self.ai = ai_manager
-        self.user_data = user_data
 
     @abstractmethod
     def can_handle(self, question_element: WebElement) -> bool:

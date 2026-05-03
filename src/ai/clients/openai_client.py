@@ -1,7 +1,7 @@
 # src/ai/clients/openai_client.py
 import json
 from openai import OpenAI
-from config.secrets import llm_api_url, llm_api_key, llm_model
+from config.secrets import secrets_data
 from src.ai.prompts import extract_skills_prompt, extract_skills_response_format, ai_answer_prompt
 from src.utils.logger import logger
 
@@ -10,11 +10,11 @@ class OpenAIClient:
     def __init__(self):
         logger.info("Initializing OpenAI Client...")
 
-        if not llm_api_key or llm_api_key == "YOUR_API_KEY":
+        if not secrets_data.llm_api_key or secrets_data.llm_api_key == "YOUR_API_KEY":
             raise ValueError("OpenAI API key is missing. Please configure it in config/secrets.py")
 
-        self.client = OpenAI(base_url=llm_api_url, api_key=llm_api_key)
-        self.model = llm_model
+        self.client = OpenAI(base_url=secrets_data.llm_api_url, api_key=secrets_data.llm_api_key)
+        self.model = secrets_data.llm_model
 
         try:
             # Validate if the chosen model exists in the API
@@ -23,7 +23,7 @@ class OpenAIClient:
                 raise ValueError(f"Model `{self.model}` is not found in the provided OpenAI API!")
 
             logger.info("---- SUCCESSFULLY CREATED OPENAI CLIENT! ----")
-            logger.info(f"Using API URL: {llm_api_url}")
+            logger.info(f"Using API URL: {secrets_data.llm_api_url}")
             logger.info(f"Using Model: {self.model}")
         except Exception as e:
             logger.error(f"Error validating OpenAI models: {e}")

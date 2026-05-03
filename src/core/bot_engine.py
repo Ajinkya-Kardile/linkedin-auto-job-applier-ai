@@ -8,16 +8,16 @@ from selenium.common.exceptions import NoSuchWindowException, WebDriverException
 
 from src.utils.logger import logger
 from src.core.job_applier import JobApplier
-import config.settings as settings
-import config.search as search_config
+from config.settings import settings_data
+from config.search import search_data
 
 
 class BotEngine:
-    def __init__(self, scraper, ai_manager, csv_manager, user_data):
+    def __init__(self, scraper, ai_manager, csv_manager):
         self.scraper = scraper
         self.ai = ai_manager
         self.csv = csv_manager
-        self.job_applier = JobApplier(scraper, ai_manager, csv_manager, user_data)
+        self.job_applier = JobApplier(scraper, ai_manager, csv_manager)
 
         # Tracking Metrics
         self.total_runs = 1
@@ -33,7 +33,7 @@ class BotEngine:
         self.blacklisted_companies = set()
 
         # temp setting
-        self.pause_after_filters = True
+        self.pause_after_filters = settings_data.pause_after_filters
 
     def start(self):
         """The main entry point for the bot execution."""
@@ -42,18 +42,18 @@ class BotEngine:
         try:
             self._run_cycle()
 
-            while settings.run_non_stop:
+            while settings_data.run_non_stop:
                 if self.daily_limit_reached:
                     logger.warning("Daily limit reached. Stopping continuous run.")
                     break
 
                 # Cycle logic from original script
-                if settings.cycle_date_posted:
+                if settings_data.cycle_date_posted:
                     self._cycle_date_settings()
-                if settings.alternate_sortby:
-                    settings.sort_by = "Most recent" if search_config.sort_by == "Most relevant" else "Most relevant"
+                if settings_data.alternate_sortby:
+                    settings_data.sort_by = "Most recent" if search_data.sort_by == "Most relevant" else "Most relevant"
                     self._run_cycle()
-                    settings.sort_by = "Most recent" if search_config.sort_by == "Most relevant" else "Most relevant"
+                    settings_data.sort_by = "Most recent" if search_data.sort_by == "Most relevant" else "Most relevant"
 
                 self._run_cycle()
 
@@ -74,8 +74,8 @@ class BotEngine:
         logger.info(f"Cycle number: {self.total_runs}")
 
         # Iterate over all search terms
-        search_terms = search_config.search_terms
-        if search_config.randomize_search_order:
+        search_terms = search_data.search_terms
+        if search_data.randomize_search_order:
             import random
             random.shuffle(search_terms)
 
@@ -103,14 +103,14 @@ class BotEngine:
             self.pause_after_filters = False
 
         current_count = 0
-        while current_count < search_config.switch_number:
+        while current_count < search_data.switch_number:
             job_listings = self.scraper.get_job_listings_on_page()
             pagination_element, current_page = self.scraper.get_page_info()
 
             for job_element in job_listings:
-                if current_count >= search_config.switch_number or self.daily_limit_reached:
+                if current_count >= search_data.switch_number or self.daily_limit_reached:
                     break
-                if settings.keep_screen_awake: pyautogui.press('shiftright')
+                if settings_data.keep_screen_awake: pyautogui.press('shiftright')
                 success = self._process_single_job(job_element)
                 if success:
                     current_count += 1
@@ -123,14 +123,14 @@ class BotEngine:
     def _process_single_job(self, job_element) -> bool:
         """Processes a single job card. Returns True if applied successfully."""
         from datetime import datetime
-        if settings.keep_screen_awake: pyautogui.press('shiftright')
+        if settings_data.keep_screen_awake: pyautogui.press('shiftright')
         details = self.scraper.extract_job_card_details(job_element)
         job_id = details.get('job_id')
         self.scraper.click_job_card(job_element)
 
         if job_id in self.applied_jobs or job_id in self.rejected_jobs or self.scraper.is_already_applied(
                 job_element) or details.get(
-                'company') in self.blacklisted_companies:
+            'company') in self.blacklisted_companies:
             logger.info(f"Skipping job {job_id} (Already processed/blacklisted)")
             self.skip_count += 1
             return False
@@ -214,9 +214,9 @@ class BotEngine:
     def _cycle_date_settings(self):
         """Rotates the date_posted filter for continuous runs."""
         date_options = ["Any time", "Past month", "Past week", "Past 24 hours"]
-        current_idx = date_options.index(search_config.date_posted)
+        current_idx = date_options.index(search_data.date_posted)
         next_idx = current_idx + 1 if current_idx + 1 < len(date_options) else 0
-        settings.date_posted = date_options[next_idx]
+        settings_data.date_posted = date_options[next_idx]
 
     def print_summary(self):
         """Prints the final summary when the bot stops."""

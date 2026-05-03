@@ -5,8 +5,10 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from src.core.question_handlers.base_handler import BaseQuestionHandler
 from src.utils.logger import logger
-import config.questions as question
-import config.personals as personal
+from config.personal import personal_data
+from config.questions import questions_data
+from config.settings import settings_data
+
 
 
 class TextHandler(BaseQuestionHandler):
@@ -37,83 +39,83 @@ class TextHandler(BaseQuestionHandler):
         do_actions = False
 
         # 3. Match Exact Conditions from original runAiBot.py
-        if not prev_answer or question.overwrite_previous_answers:
+        if not prev_answer or settings_data.overwrite_previous_answers:
             # Textarea specifics
             if question_type == "textarea":
                 if 'summary' in label_lower:
-                    answer = question.linkedin_summary
+                    answer = questions_data.linkedin_summary
                 elif 'cover' in label_lower:
-                    answer = question.cover_letter
+                    answer = questions_data.cover_letter
 
             # Standard Text Input specifics
             if answer == "":
                 if 'experience' in label_lower or 'years' in label_lower:
-                    answer = str(question.years_of_experience)
+                    answer = str(questions_data.years_of_experience)
                 elif 'phone' in label_lower or 'mobile' in label_lower:
-                    answer = personal.phone_number
+                    answer = personal_data.phone_number
                 elif 'street' in label_lower:
-                    answer = personal.street
+                    answer = personal_data.street
                 elif 'city' in label_lower or 'location' in label_lower or 'address' in label_lower:
-                    answer = personal.current_city
+                    answer = personal_data.current_city
                     do_actions = True
                 elif 'signature' in label_lower:
-                    answer = f"{personal.first_name} {personal.middle_name} {personal.last_name}"
+                    answer = personal_data.full_name
                 elif 'name' in label_lower:
                     if 'full' in label_lower:
-                        answer = f"{personal.first_name} {personal.middle_name} {personal.last_name}"
+                        answer = personal_data.full_name
                     elif 'first' in label_lower and 'last' not in label_lower:
-                        answer = personal.first_name
+                        answer = personal_data.first_name
                     elif 'middle' in label_lower and 'last' not in label_lower:
-                        answer = personal.middle_name
+                        answer = personal_data.middle_name
                     elif 'last' in label_lower and 'first' not in label_lower:
-                        answer = personal.last_name
+                        answer = personal_data.last_name
                     elif 'employer' in label_lower:
-                        answer = question.recent_employer
+                        answer = questions_data.recent_employer
                     else:
-                        answer = f"{personal.first_name} {personal.middle_name} {personal.last_name}"
+                        answer = personal_data.full_name
                 elif 'notice' in label_lower:
                     if 'month' in label_lower:
-                        answer = str(question.notice_period // 30)
+                        answer = str(questions_data.notice_period // 30)
                     elif 'week' in label_lower:
-                        answer = str(question.notice_period // 7)
+                        answer = str(questions_data.notice_period // 7)
                     else:
-                        answer = str(question.notice_period)
+                        answer = str(questions_data.notice_period)
                 elif 'salary' in label_lower or 'compensation' in label_lower or 'ctc' in label_lower or 'pay' in label_lower:
                     if 'current' in label_lower or 'present' in label_lower:
                         if 'month' in label_lower:
-                            answer = str(round(question.current_ctc / 12, 2))
+                            answer = str(round(questions_data.current_ctc / 12, 2))
                         elif 'lakh' in label_lower:
-                            answer = str(round(question.current_ctc / 100000, 2))
+                            answer = str(round(questions_data.current_ctc / 100000, 2))
                         else:
-                            answer = str(question.current_ctc)
+                            answer = str(questions_data.current_ctc)
                     else:
                         if 'month' in label_lower:
-                            answer = str(round(question.desired_salary / 12, 2))
+                            answer = str(round(questions_data.desired_salary / 12, 2))
                         elif 'lakh' in label_lower:
-                            answer = str(round(question.desired_salary / 100000, 2))
+                            answer = str(round(questions_data.desired_salary / 100000, 2))
                         else:
-                            answer = str(question.desired_salary)
+                            answer = str(questions_data.desired_salary)
                 elif 'linkedin' in label_lower:
-                    answer = question.linkedIn
+                    answer = questions_data.linkedIn
                 elif 'website' in label_lower or 'blog' in label_lower or 'portfolio' in label_lower or 'link' in label_lower:
-                    answer = question.website
+                    answer = questions_data.website
                 elif 'scale of 1-10' in label_lower:
-                    answer = str(question.confidence_level)
+                    answer = str(questions_data.confidence_level)
                 elif 'headline' in label_lower:
-                    answer = question.linkedin_headline
+                    answer = questions_data.linkedin_headline
                 elif ('hear' in label_lower or 'come across' in label_lower) and 'this' in label_lower and (
                         'job' in label_lower or 'position' in label_lower):
                     answer = ""
                 elif 'state' in label_lower or 'province' in label_lower:
-                    answer = personal.state
+                    answer = personal_data.state
                 elif 'zip' in label_lower or 'postal' in label_lower or 'code' in label_lower:
-                    answer = personal.zipcode
+                    answer = personal_data.zipcode
                 elif 'country' in label_lower:
-                    answer = personal.country
+                    answer = personal_data.country
 
             # 4. Fallback to AI
             if answer == "" and self.ai.is_active:
-                answer = self.ai.get_answer(label_text, question_type, job_description, self.user_data)
+                answer = self.ai.get_answer(label_text, question_type, job_description)
 
             # 5. Execute Action
             input_element.clear()

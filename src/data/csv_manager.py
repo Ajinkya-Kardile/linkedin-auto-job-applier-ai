@@ -4,15 +4,13 @@ import os
 from datetime import datetime
 from src.utils.logger import logger
 from src.utils.text_helpers import truncate_for_csv
-
-# We import file paths from your existing config
-from config.settings import file_name as APPLIED_CSV, failed_file_name as FAILED_CSV
+from config.settings import settings_data
 
 
 class CSVManager:
     def __init__(self):
         # Ensure directories exist
-        os.makedirs(os.path.dirname(APPLIED_CSV) or ".", exist_ok=True)
+        os.makedirs(os.path.dirname(settings_data.file_name) or ".", exist_ok=True)
         # Increase field size limit to prevent errors
         csv.field_size_limit(1000000)
 
@@ -20,26 +18,26 @@ class CSVManager:
         """Returns a set of Job IDs from existing applied jobs history csv file."""
         job_ids = set()
         try:
-            with open(APPLIED_CSV, 'r', encoding='utf-8') as file:
+            with open(settings_data.file_name, 'r', encoding='utf-8') as file:
                 reader = csv.DictReader(file)
                 for row in reader:
                     # Guard against empty rows or missing headers
                     if 'Job ID' in row and row['Job ID']:
                         job_ids.add(row['Job ID'])
         except FileNotFoundError:
-            logger.warning(f"CSV file '{APPLIED_CSV}' does not exist yet. Starting fresh.")
+            logger.warning(f"CSV file '{settings_data.file_name}' does not exist yet. Starting fresh.")
         return job_ids
 
     def get_all_applied_jobs_for_ui(self) -> list[dict]:
         """Used by the Flask web server to display the dashboard."""
         jobs = []
         try:
-            with open(APPLIED_CSV, 'r', encoding='utf-8') as file:
+            with open(settings_data.file_name, 'r', encoding='utf-8') as file:
                 reader = csv.DictReader(file)
                 for row in reader:
                     jobs.append(row)
         except FileNotFoundError:
-            logger.error(f"No applications history found at {APPLIED_CSV}")
+            logger.error(f"No applications history found at {settings_data.file_name}")
         return jobs
 
     def log_submitted_job(self, job_data: dict) -> None:
@@ -52,8 +50,8 @@ class CSVManager:
         ]
 
         try:
-            file_exists = os.path.isfile(APPLIED_CSV)
-            with open(APPLIED_CSV, mode='a', newline='', encoding='utf-8') as file:
+            file_exists = os.path.isfile(settings_data.file_name)
+            with open(settings_data.file_name, mode='a', newline='', encoding='utf-8') as file:
                 writer = csv.DictWriter(file, fieldnames=fieldnames)
                 if not file_exists or file.tell() == 0:
                     writer.writeheader()
@@ -73,8 +71,8 @@ class CSVManager:
         ]
 
         try:
-            file_exists = os.path.isfile(FAILED_CSV)
-            with open(FAILED_CSV, mode='a', newline='', encoding='utf-8') as file:
+            file_exists = os.path.isfile(settings_data.failed_file_name)
+            with open(settings_data.failed_file_name, mode='a', newline='', encoding='utf-8') as file:
                 writer = csv.DictWriter(file, fieldnames=fieldnames)
                 if not file_exists or file.tell() == 0:
                     writer.writeheader()

@@ -1,9 +1,9 @@
 # src/core/question_handlers/radio_handler.py
 from src.core.question_handlers.base_handler import BaseQuestionHandler
 from selenium.webdriver.common.by import By
-import config.questions as question
-import config.personals as personal
-
+from config.personal import personal_data
+from config.questions import questions_data
+from config.settings import settings_data
 
 class RadioHandler(BaseQuestionHandler):
     def can_handle(self, question_element):
@@ -40,16 +40,16 @@ class RadioHandler(BaseQuestionHandler):
 
         answer = 'Yes'
 
-        if question.overwrite_previous_answers or prev_answer is None:
+        if settings_data.overwrite_previous_answers or prev_answer is None:
             # Exact mapping
             if 'citizenship' in label_lower or 'employment eligibility' in label_lower:
-                answer = question.us_citizenship
+                answer = questions_data.us_citizenship
             elif 'veteran' in label_lower or 'protected' in label_lower:
-                answer = personal.veteran_status
+                answer = personal_data.veteran_status
             elif 'disability' in label_lower or 'handicapped' in label_lower:
-                answer = personal.disability_status
+                answer = personal_data.disability_status
             elif 'sponsorship' in label_lower or 'visa' in label_lower:
-                answer = question.require_visa
+                answer = questions_data.require_visa
 
             # Find and click correct option
             found_option = self.scraper.interactor.try_xpath(f".//label[normalize-space()='{answer}']", click=False,

@@ -4,12 +4,10 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import SessionNotCreatedException
 
-from config.settings import (
-    run_in_background, stealth_mode, disable_extensions, safe_mode
-)
+from config.settings import settings_data
 from src.utils.logger import logger
 
-if stealth_mode:
+if settings_data.stealth_mode:
     import undetected_chromedriver as uc
 else:
     from selenium import webdriver
@@ -35,25 +33,25 @@ def create_driver(is_retry: bool = False):
     """
     Initializes and returns the WebDriver, ActionChains, and WebDriverWait.
     """
-    options = uc.ChromeOptions() if stealth_mode else Options()
+    options = uc.ChromeOptions() if settings_data.stealth_mode else Options()
 
-    if run_in_background:
+    if settings_data.run_in_background:
         options.add_argument("--headless")
-    if disable_extensions:
+    if settings_data.disable_extensions:
         options.add_argument("--disable-extensions")
 
     profile_dir = find_default_profile_directory()
 
     if is_retry:
         logger.info("Retrying with a guest profile. Browsing history will not be saved.")
-    elif profile_dir and not safe_mode:
+    elif profile_dir and not settings_data.safe_mode:
         options.add_argument(f"--user-data-dir={profile_dir}")
     else:
         logger.info("Logging in with a guest profile.")
         options.add_argument(f"--user-data-dir={get_default_temp_profile()}")
 
     try:
-        if stealth_mode:
+        if settings_data.stealth_mode:
             logger.info("Initializing undetected-chromedriver...")
             driver = uc.Chrome(options=options, version_main=147)
         else:

@@ -1,7 +1,7 @@
 # src/ai/clients/deepseek_client.py
 import json
 from openai import OpenAI
-from config.secrets import llm_api_url, llm_api_key, llm_model
+from config.secrets import secrets_data
 from src.ai.prompts import deepseek_extract_skills_prompt, ai_answer_prompt
 from src.utils.logger import logger
 
@@ -10,14 +10,14 @@ class DeepSeekClient:
     def __init__(self):
         logger.info("Initializing DeepSeek Client...")
 
-        if not llm_api_key or llm_api_key == "YOUR_API_KEY":
+        if not secrets_data.llm_api_key or secrets_data.llm_api_key == "YOUR_API_KEY":
             raise ValueError("DeepSeek API key is missing. Please configure it in config/secrets.py")
 
         # Handle trailing slashes in custom URLs
-        base_url = llm_api_url[:-1] if llm_api_url.endswith('/') else llm_api_url
+        base_url = secrets_data.llm_api_url[:-1] if secrets_data.llm_api_url.endswith('/') else secrets_data.llm_api_url
 
-        self.client = OpenAI(base_url=base_url, api_key=llm_api_key)
-        self.model = llm_model
+        self.client = OpenAI(base_url=base_url, api_key=secrets_data.llm_api_key)
+        self.model = secrets_data.llm_model
 
         logger.info("---- SUCCESSFULLY CREATED DEEPSEEK CLIENT! ----")
         logger.info(f"Using API URL: {base_url}")

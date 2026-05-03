@@ -8,23 +8,24 @@ from src.core.question_handlers.radio_handler import RadioHandler
 from src.core.question_handlers.select_handler import SelectHandler
 from src.core.question_handlers.checkbox_handler import CheckboxHandler
 from src.utils.logger import logger
-from config.questions import default_resume_path
-import config.settings as settings
-import config.questions as questions
+from config.personal import personal_data
+from config.settings import settings_data
+from config.questions import questions_data
+
 
 
 class JobApplier:
-    def __init__(self, scraper, ai_manager, csv_manager, user_data):
+    def __init__(self, scraper, ai_manager, csv_manager):
         self.scraper = scraper
         self.ai = ai_manager
         self.csv = csv_manager
-        self.pause_before_submit = questions.pause_before_submit
+        self.pause_before_submit = settings_data.pause_before_submit
 
         self.handlers = [
-            SelectHandler(scraper, ai_manager, user_data),
-            RadioHandler(scraper, ai_manager, user_data),
-            TextHandler(scraper, ai_manager, user_data),
-            CheckboxHandler(scraper, ai_manager, user_data)
+            SelectHandler(scraper, ai_manager),
+            RadioHandler(scraper, ai_manager),
+            TextHandler(scraper, ai_manager),
+            CheckboxHandler(scraper, ai_manager)
         ]
 
     def execute_easy_apply_flow(self, job_id, job_description):
@@ -36,7 +37,6 @@ class JobApplier:
 
             self.scraper.interactor.wait_span_click("Next", timeout=1)
 
-            resume = "Previous resume"
             errored = ""
             questions_list = set()
             next_button = True
@@ -46,15 +46,15 @@ class JobApplier:
                 next_counter += 1
                 if next_counter > 15:
                     logger.error("Stuck in a loop of next buttons. Aborting application.")
-                    if questions.pause_at_failed_question:
+                    if settings_data.pause_at_failed_question:
                         self.scraper.interactor.save_screenshot(job_id,
                                                                 "Needed manual intervention for failed question")
                         pyautogui.alert(
-                            "Couldn't answer one or more questions.\nPlease click \"Continue\" once done.\nDO NOT CLICK Back, Next or Review button in LinkedIn.\n\n\n\n\nYou can turn off \"Pause at failed question\" setting in config.py",
+                            "Couldn't answer one or more questions_data.\nPlease click \"Continue\" once done.\nDO NOT CLICK Back, Next or Review button in LinkedIn.\n\n\n\n\nYou can turn off \"Pause at failed question\" setting in config.py",
                             "Help Needed", "Continue")
                         next_counter = 1
                         continue
-                    if questions_list: logger.error("Stuck for one or some of the following questions...",
+                    if questions_list: logger.error("Stuck for one or some of the following questions_data...",
                                                     questions_list)
                     self.scraper.interactor.save_screenshot(job_id, "Failed at questions")
                     errored = "stuck"
@@ -65,10 +65,8 @@ class JobApplier:
                 questions_list.update(new_questions)
 
                 # 2. Upload resume if prompted
-                if settings.uploadNewResume and not uploaded: uploaded, resume = self._upload_resume(modal,
-                                                                                                     default_resume_path)
-
-                # self._upload_resume(modal, default_resume_path)
+                if settings_data.uploadNewResume and not uploaded: uploaded, _ = self._upload_resume(modal,
+                                                                                                     questions_data.default_resume_path)
 
                 # 3. Navigate forward (Try Review first, then Next)
                 review_btn = self.scraper.interactor.wait_span_click("Review", timeout=1, click=False)
@@ -85,7 +83,7 @@ class JobApplier:
                 self.scraper.interactor.sleep_buffer(1, 2)
 
             # Final Screen Actions
-            self._handle_follow_company(modal, settings.follow_companies)
+            self._handle_follow_company(modal, settings_data.follow_companies)
 
             # --------
             if errored != "stuck" and self.pause_before_submit:

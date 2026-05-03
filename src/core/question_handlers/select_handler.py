@@ -1,11 +1,14 @@
 # src/core/question_handlers/select_handler.py
 import random
+
+from selenium.webdriver.common.by import By
 from selenium.webdriver.support.select import Select
 from selenium.common.exceptions import NoSuchElementException
 from src.core.question_handlers.base_handler import BaseQuestionHandler
 from src.utils.logger import logger
-import config.questions as question
-import config.personals as personal
+from config.questions import questions_data
+from config.personal import personal_data
+from config.settings import settings_data
 
 class SelectHandler(BaseQuestionHandler):
     def can_handle(self, question_element):
@@ -28,27 +31,27 @@ class SelectHandler(BaseQuestionHandler):
         answer = 'Yes'
         prev_answer = selected_option
 
-        if question.overwrite_previous_answers or selected_option == "Select an option":
+        if settings_data.overwrite_previous_answers or selected_option == "Select an option":
             # Match Exact Conditions
             if 'email' in label_lower or 'phone' in label_lower:
                 answer = prev_answer
             elif 'gender' in label_lower or 'sex' in label_lower:
-                answer = personal.gender
+                answer = personal_data.gender
             elif 'disability' in label_lower:
-                answer = personal.disability_status
+                answer = personal_data.disability_status
             elif 'proficiency' in label_lower:
                 answer = 'Professional'
             elif any(loc_word in label_lower for loc_word in ['location', 'city', 'state', 'country']):
                 if 'country' in label_lower:
-                    answer = personal.country
+                    answer = personal_data.country
                 elif 'state' in label_lower:
-                    answer = personal.state
+                    answer = personal_data.state
                 elif 'city' in label_lower:
-                    answer = personal.current_city
+                    answer = personal_data.current_city
                 else:
                     answer = ''
             elif 'sponsorship' in label_lower or 'visa' in label_lower:
-                answer = question.require_visa
+                answer = questions_data.require_visa
 
             # Try to select the answer
             try:

@@ -1,6 +1,6 @@
 # src/ai/ai_manager.py
 from src.utils.logger import logger
-from config.secrets import use_AI, ai_provider
+from config.secrets import secrets_data
 
 # You will move your existing logic from modules/ai/ into these client files
 from src.ai.clients.openai_client import OpenAIClient
@@ -10,8 +10,8 @@ from src.ai.clients.deepseek_client import DeepSeekClient
 
 class AIManager:
     def __init__(self):
-        self.is_active = use_AI
-        self.provider = ai_provider.lower() if use_AI else None
+        self.is_active = secrets_data.use_AI
+        self.provider = secrets_data.ai_provider.lower() if secrets_data.use_AI else None
         self.client = self._initialize_client()
 
     def _initialize_client(self):

@@ -12,9 +12,8 @@ from src.browser.interactors import DOMInteractor
 from src.utils.logger import logger
 
 # Import configurations used for filtering and blacklisting
-import config.settings as settings
-import config.search as search_config
-from config.search import current_experience, did_masters
+from config.search import search_data
+from config.settings import settings_data
 
 
 class LinkedInScraper:
@@ -90,14 +89,14 @@ class LinkedInScraper:
     def apply_filters(self):
         """Applies location and job preferences from config."""
         # 1. Location
-        if search_config.search_location.strip():
-            logger.info(f"Setting location: {search_config.search_location}")
+        if search_data.search_location.strip():
+            logger.info(f"Setting location: {search_data.search_location}")
             try:
                 loc_input = self.interactor.try_xpath(
                     ".//input[@aria-label='City, state, or zip code'and not(@disabled)]", click=False)
                 if loc_input:
                     loc_input.send_keys(Keys.CONTROL + "a")
-                    loc_input.send_keys(search_config.search_location.strip())
+                    loc_input.send_keys(search_data.search_location.strip())
                     time.sleep(2)
                     loc_input.send_keys(Keys.ENTER)
             except Exception as e:
@@ -110,29 +109,29 @@ class LinkedInScraper:
             self.interactor.sleep_buffer(1, 3)
 
             # Standard Spans
-            self.interactor.wait_span_click(search_config.sort_by)
-            self.interactor.wait_span_click(search_config.date_posted)
+            self.interactor.wait_span_click(search_data.sort_by)
+            self.interactor.wait_span_click(search_data.date_posted)
 
             # Multi-selects (Assuming multi_sel_noWait logic is implemented in interactor or handled here)
-            for text in (search_config.experience_level + search_config.job_type
-                         + search_config.on_site + search_config.location
-                         + search_config.job_titles + search_config.benefits + search_config.commitments):
+            for text in (search_data.experience_level + search_data.job_type
+                         + search_data.on_site + search_data.location
+                         + search_data.job_titles + search_data.benefits + search_data.commitments):
                 self.interactor.wait_span_click(text, timeout=2, scroll=True)
 
-            for company in search_config.companies:
+            for company in search_data.companies:
                 self.interactor.span_search_click("Add a company", company)
 
-            for industry in search_config.industry:
+            for industry in search_data.industry:
                 self.interactor.span_search_click("Add an industry", industry)
 
-            for job in search_config.job_function:
+            for job in search_data.job_function:
                 self.interactor.span_search_click("Add a job function", job)
 
             # Easy Apply Toggle
-            if search_config.easy_apply_only: self.interactor.toggle_button_click("Easy Apply")
-            if search_config.under_10_applicants: self.interactor.toggle_button_click("Under 10 applicants")
-            if search_config.in_your_network: self.interactor.toggle_button_click("In your network")
-            if search_config.fair_chance_employer: self.interactor.toggle_button_click("Fair Chance Employer")
+            if search_data.easy_apply_only: self.interactor.toggle_button_click("Easy Apply")
+            if search_data.under_10_applicants: self.interactor.toggle_button_click("Under 10 applicants")
+            if search_data.in_your_network: self.interactor.toggle_button_click("In your network")
+            if search_data.fair_chance_employer: self.interactor.toggle_button_click("Fair Chance Employer")
 
             # Show Results
             show_results = self.driver.find_element(By.XPATH,
@@ -234,10 +233,10 @@ class LinkedInScraper:
             # Check About Company
             about_company_org = self.driver.find_element(By.CLASS_NAME, "jobs-company__box").text.lower()
             skip_company_check = any(
-                word.lower() in about_company_org for word in search_config.about_company_good_words)
+                word.lower() in about_company_org for word in search_data.about_company_good_words)
 
             if not skip_company_check:
-                for word in search_config.about_company_bad_words:
+                for word in search_data.about_company_bad_words:
                     if word.lower() in about_company_org:
                         return "", f"Blacklisted company word found: {word}"
 
@@ -246,11 +245,11 @@ class LinkedInScraper:
             job_desc = job_desc_element.text
             job_desc_lower = job_desc.lower()
 
-            for word in search_config.bad_words:
+            for word in search_data.bad_words:
                 if word.lower() in job_desc_lower:
                     return job_desc, f"Blacklisted job word found: {word}"
 
-            if not search_config.security_clearance and any(
+            if not search_data.security_clearance and any(
                     w in job_desc_lower for w in ['polygraph', 'clearance', 'secret']):
                 return job_desc, "Requires security clearance"
 
@@ -258,9 +257,9 @@ class LinkedInScraper:
             matches = re.findall(self.re_experience, job_desc)
             if matches:
                 req_exp = max([int(m) for m in matches if int(m) <= 12])
-                masters_bonus = 2 if did_masters and 'master' in job_desc_lower else 0
-                if current_experience > -1 and req_exp > (current_experience + masters_bonus):
-                    return job_desc, f"Required experience ({req_exp}) exceeds current ({current_experience})"
+                masters_bonus = 2 if search_data.did_masters and 'master' in job_desc_lower else 0
+                if search_data.current_experience > -1 and req_exp > (search_data.current_experience + masters_bonus):
+                    return job_desc, f"Required experience ({req_exp}) exceeds current ({search_data.current_experience})"
 
             return job_desc, None
 
@@ -304,7 +303,7 @@ class LinkedInScraper:
         windows = self.driver.window_handles
         if len(windows) > 1:
             self.driver.switch_to.window(windows[-1])
-            if settings.close_tabs:
+            if settings_data.close_tabs:
                 self.driver.close()
             self.driver.switch_to.window(windows[0])
 

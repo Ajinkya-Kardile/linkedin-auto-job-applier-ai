@@ -7,7 +7,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.common.exceptions import MoveTargetOutOfBoundsException, TimeoutException
 
-from config.settings import click_gap, smooth_scroll
+from config.settings import settings_data
 from src.utils.logger import logger
 
 
@@ -21,7 +21,7 @@ class DOMInteractor:
         """Standardized randomized pause between interactions."""
         if max_seconds is None:
             # Fallback to the settings click_gap, or 1.5 if not set
-            max_seconds = click_gap if click_gap else 1.5
+            max_seconds = settings_data.click_gap if settings_data.click_gap else 1.5
         time.sleep(random.uniform(min_seconds, max_seconds))
 
     def human_click(self, element: WebElement):
@@ -67,7 +67,7 @@ class DOMInteractor:
         if top:
             self.driver.execute_script('arguments[0].scrollIntoView(true);', element)
         else:
-            behavior = "smooth" if smooth_scroll else "instant"
+            behavior = "smooth" if settings_data.smooth_scroll else "instant"
             self.driver.execute_script(f'arguments[0].scrollIntoView({{block: "center", behavior: "{behavior}"}});',
                                        element)
         # Brief pause after scrolling to let human "eyes" settle

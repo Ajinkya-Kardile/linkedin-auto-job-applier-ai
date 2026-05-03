@@ -1,7 +1,7 @@
 # src/ai/clients/gemini_client.py
 import json
 import google.generativeai as genai
-from config.secrets import llm_api_key, llm_model
+from config.secrets import secrets_data
 from src.ai.prompts import extract_skills_prompt, ai_answer_prompt
 from src.utils.logger import logger
 
@@ -10,11 +10,11 @@ class GeminiClient:
     def __init__(self):
         logger.info("Initializing Gemini Client...")
 
-        if not llm_api_key or "YOUR_API_KEY" in llm_api_key:
+        if not secrets_data.llm_api_key or "YOUR_API_KEY" in secrets_data.llm_api_key:
             raise ValueError("Gemini API key is not set. Please configure it in config/secrets.py")
 
-        genai.configure(api_key=llm_api_key)
-        self.model = genai.GenerativeModel(llm_model)
+        genai.configure(api_key=secrets_data.llm_api_key)
+        self.model = genai.GenerativeModel(secrets_data.llm_model)
 
         # Define relaxed safety settings for job applications to prevent false positives
         self.safety_settings = [
@@ -25,7 +25,7 @@ class GeminiClient:
         ]
 
         logger.info("---- SUCCESSFULLY CONFIGURED GEMINI CLIENT! ----")
-        logger.info(f"Using Model: {llm_model}")
+        logger.info(f"Using Model: {secrets_data.llm_model}")
 
     def extract_skills(self, job_description: str) -> dict | str:
         logger.info("-- EXTRACTING SKILLS FROM JOB DESCRIPTION [Gemini]")

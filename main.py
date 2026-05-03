@@ -10,7 +10,6 @@ from src.utils.logger import logger
 
 # Import your configurations
 import config.secrets as secrets
-import config.personals as personals
 
 
 def main():
@@ -38,7 +37,6 @@ def main():
         scraper=scraper,
         ai_manager=ai_manager,
         csv_manager=csv_manager,
-        user_data=personals.__dict__  # Pass personal config as a dict safely
     )
 
     try:
