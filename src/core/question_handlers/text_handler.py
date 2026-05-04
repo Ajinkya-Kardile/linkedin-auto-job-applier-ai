@@ -103,6 +103,10 @@ class TextHandler(BaseQuestionHandler):
                     answer = questions_data.website
                 elif 'scale of 1-10' in label_lower:
                     answer = str(questions_data.confidence_level)
+                elif 'scale of 1-5' in label_lower:
+                    normalized = round((questions_data.confidence_level / 10) * 5)
+                    normalized = max(1, min(5, normalized))
+                    answer = str(normalized)
                 elif 'headline' in label_lower:
                     answer = questions_data.linkedin_headline
                 elif ('hear' in label_lower or 'come across' in label_lower) and 'this' in label_lower and (

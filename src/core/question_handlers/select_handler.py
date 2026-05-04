@@ -41,6 +41,11 @@ class SelectHandler(BaseQuestionHandler):
                 answer = personal_data.disability_status
             elif 'proficiency' in label_lower:
                 answer = 'Professional'
+            elif 'experience' in label_lower:
+                if 'years' in label_lower:
+                    answer = str(questions_data.years_of_experience)
+                elif 'additional months' in label_lower:
+                    answer = str(questions_data.additional_months_of_experience)
             elif any(loc_word in label_lower for loc_word in ['location', 'city', 'state', 'country']):
                 if 'country' in label_lower:
                     answer = personal_data.country
