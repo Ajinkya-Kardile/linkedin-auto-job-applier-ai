@@ -52,11 +52,11 @@ class LinkedInScraper:
                     logger.warning("Auto-login failed (Captcha?). Please login manually.")
                     if not self.manual_login_retry():
                         logger.critical("Manual login failed. Exiting.")
-        except Exception as e:
+        except Exception:
             try:
                 profile_button = self.interactor.find_by_class("profile__details")
                 profile_button.click()
-            except Exception as e2:
+            except Exception:
                 logger.error("Couldn't Login!")
 
     def auto_login(self, username, password):
@@ -68,7 +68,7 @@ class LinkedInScraper:
             self.driver.find_element(By.XPATH, '//button[@type="submit" and contains(text(), "Sign in")]').click()
             self.wait.until(EC.url_to_be("https://www.linkedin.com/feed/"))
             logger.info("Login successful!")
-        except Exception as e:
+        except Exception:
             logger.error("Login attempt failed. Manual intervention may be required.", exc_info=True)
 
     def manual_login_retry(self, retries=2):
