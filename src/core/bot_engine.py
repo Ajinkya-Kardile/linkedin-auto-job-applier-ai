@@ -104,16 +104,30 @@ class BotEngine:
 
         current_count = 0
         while current_count < search_data.switch_number:
-            job_listings = self.scraper.get_job_listings_on_page()
+            initial_job_listings = self.scraper.get_job_listings_on_page()
+            num_jobs_on_page = len(initial_job_listings)
+
             pagination_element, current_page = self.scraper.get_page_info()
 
-            for job_element in job_listings:
+            for i in range(num_jobs_on_page):
                 if current_count >= search_data.switch_number or self.daily_limit_reached:
                     break
-                if settings_data.keep_screen_awake: pyautogui.press('shiftright')
-                success = self._process_single_job(job_element)
-                if success:
-                    current_count += 1
+                if settings_data.keep_screen_awake:
+                    pyautogui.press('shiftright')
+
+                try:
+                    current_job_listings = self.scraper.get_job_listings_on_page()
+                    if i >= len(current_job_listings):
+                        break
+                    fresh_job_element = current_job_listings[i]
+
+                    success = self._process_single_job(fresh_job_element)
+                    if success:
+                        current_count += 1
+
+                except Exception as e:
+                    logger.warning(f"Error processing job at index {i}, safely skipping to next. Error: {e}")
+                    continue
 
             # Go to next page
             if not pagination_element or not self.scraper.go_to_next_page(pagination_element, current_page):

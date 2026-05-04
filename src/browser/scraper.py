@@ -162,9 +162,14 @@ class LinkedInScraper:
         return None, None
 
     def go_to_next_page(self, pagination_element, current_page) -> bool:
+        """Navigates to the next page of job results safely."""
         try:
             next_button_xpath = f".//button[@aria-label='Page {current_page + 1}']"
-            next_btn = pagination_element.find_element(By.XPATH, next_button_xpath)
+            next_buttons = pagination_element.find_elements(By.XPATH, next_button_xpath)
+            if not next_buttons:
+                logger.info(f"No button found for Page {current_page + 1}. Reached the end of search results.")
+                return False  # Returns False so the bot knows to move to the next search term
+            next_btn = next_buttons[0]
             self.interactor.scroll_to_view(next_btn)
             try:
                 self.interactor.human_click(next_btn)
@@ -174,7 +179,7 @@ class LinkedInScraper:
             return True
 
         except Exception as e:
-            self.logger.error(f"Failed to navigate to page {current_page + 1}: {e}")
+            logger.error(f"Safely caught error navigating to page {current_page + 1}: {e}")
             return False
 
     def get_job_listings_on_page(self):

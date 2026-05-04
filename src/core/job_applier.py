@@ -44,7 +44,7 @@ class JobApplier:
             uploaded = False
             while next_button:
                 next_counter += 1
-                if next_counter > 15:
+                if next_counter > 10:
                     logger.error("Stuck in a loop of next buttons. Aborting application.")
                     if settings_data.pause_at_failed_question:
                         self.scraper.interactor.save_screenshot(job_id,

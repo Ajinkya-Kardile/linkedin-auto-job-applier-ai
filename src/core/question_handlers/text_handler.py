@@ -101,9 +101,9 @@ class TextHandler(BaseQuestionHandler):
                     answer = questions_data.linkedIn
                 elif 'website' in label_lower or 'blog' in label_lower or 'portfolio' in label_lower or 'link' in label_lower:
                     answer = questions_data.website
-                elif 'scale of 1-10' in label_lower:
+                elif 'scale of 1–10' in label_lower:
                     answer = str(questions_data.confidence_level)
-                elif 'scale of 1-5' in label_lower:
+                elif 'scale of 1–5' in label_lower:
                     normalized = round((questions_data.confidence_level / 10) * 5)
                     normalized = max(1, min(5, normalized))
                     answer = str(normalized)
