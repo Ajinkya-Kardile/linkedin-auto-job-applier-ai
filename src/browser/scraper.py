@@ -307,7 +307,6 @@ class LinkedInScraper:
                 self.driver.close()
             self.driver.switch_to.window(windows[0])
 
-    from selenium.webdriver.common.by import By
 
     def is_already_applied(self, job_element) -> bool:
         """Safely checks if a job is already applied to without throwing exceptions."""
@@ -326,9 +325,25 @@ class LinkedInScraper:
             return False
 
     def discard_application(self):
-        """Cancels an ongoing easy apply application."""
+        """Safely closes the Easy Apply modal and confirms the discard."""
+        from selenium.webdriver.common.keys import Keys
+
         try:
-            self.actions.send_keys(Keys.ESCAPE).perform()
-            self.interactor.wait_span_click('Discard', timeout=2)
-        except:
-            pass
+            logger.info("Attempting to discard the application...")
+            close_btn_xpath = "//button[contains(@data-test-modal-close-btn, '') or contains(@aria-label, 'Dismiss')]"
+            if self.interactor.try_xpath(close_btn_xpath):
+                self.interactor.sleep_buffer(1.0, 2.0)
+            else:
+                self.actions.send_keys(Keys.ESCAPE).perform()
+                self.interactor.sleep_buffer(1.0, 2.0)
+            discard_btn = self.interactor.wait_span_click("Discard", timeout=3)
+
+            if not discard_btn:
+                confirm_discard_xpath = "//button[@data-control-name='discard_application_confirm_btn']"
+                self.interactor.try_xpath(confirm_discard_xpath)
+
+            logger.info("Application discarded successfully.")
+            self.interactor.sleep_buffer(1.0, 2.0)
+
+        except Exception as e:
+            logger.debug(f"Failed to discard application cleanly: {e}")
