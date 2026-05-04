@@ -54,7 +54,7 @@ class SelectHandler(BaseQuestionHandler):
                 elif 'city' in label_lower:
                     answer = personal_data.current_city
                 else:
-                    answer = ''
+                    answer = personal_data.current_city
             elif 'sponsorship' in label_lower or 'visa' in label_lower:
                 answer = questions_data.require_visa
 

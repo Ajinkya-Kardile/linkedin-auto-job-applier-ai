@@ -330,25 +330,76 @@ class LinkedInScraper:
             return False
 
     def discard_application(self):
-        """Safely closes the Easy Apply modal and confirms the discard."""
+        """Safely and relentlessly closes the Easy Apply modal and confirms the discard."""
+        from selenium.webdriver.common.by import By
         from selenium.webdriver.common.keys import Keys
+        import time
 
-        try:
-            logger.info("Attempting to discard the application...")
-            close_btn_xpath = "//button[contains(@data-test-modal-close-btn, '') or contains(@aria-label, 'Dismiss')]"
-            if self.interactor.try_xpath(close_btn_xpath):
-                self.interactor.sleep_buffer(1.0, 2.0)
-            else:
-                self.actions.send_keys(Keys.ESCAPE).perform()
-                self.interactor.sleep_buffer(1.0, 2.0)
-            discard_btn = self.interactor.wait_span_click("Discard", timeout=3)
+        logger.info("Attempting to discard the application...")
 
-            if not discard_btn:
-                confirm_discard_xpath = "//button[@data-control-name='discard_application_confirm_btn']"
-                self.interactor.try_xpath(confirm_discard_xpath)
+        max_attempts = 3
+        attempt = 0
 
-            logger.info("Application discarded successfully.")
-            self.interactor.sleep_buffer(1.0, 2.0)
+        while attempt < max_attempts:
+            try:
+                # 1. Check if the modal is even open. If not, we are done!
+                modal = self.driver.find_elements(By.XPATH, '//div[contains(@class, "jobs-easy-apply-modal")]')
+                if not modal:
+                    logger.info("Application modal is completely closed.")
+                    return
 
-        except Exception as e:
-            logger.debug(f"Failed to discard application cleanly: {e}")
+                # 2. Try to click the "X" (Dismiss) button
+                close_btn_xpaths = [
+                    "//button[contains(@data-test-modal-close-btn, '')]",
+                    "//button[contains(@aria-label, 'Dismiss')]",
+                    "//li-icon[@type='cancel-icon']/parent::button"
+                ]
+
+                close_clicked = False
+                for xpath in close_btn_xpaths:
+                    close_btn = self.driver.find_elements(By.XPATH, xpath)
+                    if close_btn:
+                        try:
+                            # Force click via JS to bypass any overlapping tooltips
+                            self.driver.execute_script("arguments[0].click();", close_btn[0])
+                            close_clicked = True
+                            break
+                        except Exception:
+                            pass
+
+                # Fallback to ESCAPE if no "X" button worked
+                if not close_clicked:
+                    self.actions.send_keys(Keys.ESCAPE).perform()
+
+                # Wait for the confirmation dialog animation to finish
+                time.sleep(1.5)
+
+                # 3. Try to click the "Discard" confirmation button
+                discard_confirm_xpaths = [
+                    "//button[@data-control-name='discard_application_confirm_btn']",
+                    "//button[contains(@class, 'artdeco-modal__confirm-dialog-btn') and contains(., 'Discard')]",
+                    "//span[text()='Discard']/parent::button"
+                ]
+
+                for xpath in discard_confirm_xpaths:
+                    discard_btn = self.driver.find_elements(By.XPATH, xpath)
+                    if discard_btn:
+                        try:
+                            # Force click the discard confirmation
+                            self.driver.execute_script("arguments[0].click();", discard_btn[0])
+                            time.sleep(1.5)  # Wait for it to close
+                            break
+                        except Exception:
+                            pass
+
+                attempt += 1
+
+            except Exception as e:
+                logger.debug(f"Discard attempt {attempt} encountered an issue: {e}")
+                attempt += 1
+                time.sleep(1)
+
+        # Final check to see if it closed after all attempts
+        if self.driver.find_elements(By.XPATH, '//div[contains(@class, "jobs-easy-apply-modal")]'):
+            logger.warning("Failed to discard application after 3 attempts. It might be stuck.")
+

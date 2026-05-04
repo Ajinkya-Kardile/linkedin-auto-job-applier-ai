@@ -191,6 +191,7 @@ class BotEngine:
                     })
                 else:
                     self.failed_count += 1
+                    self.scraper.discard_application()
             # else:
             #     self.scraper.handle_external_apply()
             #     self.external_jobs_count += 1
