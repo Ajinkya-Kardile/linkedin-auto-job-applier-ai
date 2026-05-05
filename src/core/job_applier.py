@@ -13,7 +13,6 @@ from config.settings import settings_data
 from config.questions import questions_data
 
 
-
 class JobApplier:
     def __init__(self, scraper, ai_manager, csv_manager):
         self.scraper = scraper
@@ -128,6 +127,7 @@ class JobApplier:
                 for handler in self.handlers:
                     if handler.can_handle(question):
                         label, answer, q_type = handler.handle(question, job_description)
+                        logger.info(f'Question: {label} ==> {answer}')
                         questions_list.add((label, answer, q_type))
                         handled = True
                         break

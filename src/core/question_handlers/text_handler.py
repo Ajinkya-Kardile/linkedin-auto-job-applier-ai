@@ -75,7 +75,7 @@ class TextHandler(BaseQuestionHandler):
                         answer = questions_data.recent_employer
                     else:
                         answer = personal_data.full_name
-                elif 'notice' in label_lower or 'join new company after offer is released?' in label_lower:
+                elif 'notice' in label_lower or 'can you join' in label_lower:
                     if 'month' in label_lower:
                         answer = str(questions_data.notice_period // 30)
                     elif 'week' in label_lower:
