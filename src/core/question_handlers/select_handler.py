@@ -57,6 +57,25 @@ class SelectHandler(BaseQuestionHandler):
                     answer = personal_data.current_city
             elif 'sponsorship' in label_lower or 'visa' in label_lower:
                 answer = questions_data.require_visa
+            elif 'personal relationship' in label_lower:
+                answer = "no"
+            elif 'shareholder' in label_lower:
+                answer = "no"
+            elif 'salary' in label_lower or 'compensation' in label_lower or 'ctc' in label_lower or 'pay' in label_lower:
+                if 'current' in label_lower or 'present' in label_lower:
+                    if 'month' in label_lower:
+                        answer = str(round(questions_data.current_ctc / 12))
+                    elif 'lakh' in label_lower or 'lpa' in label_lower:
+                        answer = str(round(questions_data.current_ctc / 100000))
+                    else:
+                        answer = str(questions_data.current_ctc)
+                else:
+                    if 'month' in label_lower:
+                        answer = str(round(questions_data.desired_salary / 12, 2))
+                    elif 'lakh' in label_lower or 'lpa' in label_lower:
+                        answer = str(round(questions_data.desired_salary / 100000, 2))
+                    else:
+                        answer = str(questions_data.desired_salary)
 
             # Try to select the answer
             try:

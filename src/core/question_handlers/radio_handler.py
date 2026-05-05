@@ -50,6 +50,10 @@ class RadioHandler(BaseQuestionHandler):
                 answer = personal_data.disability_status
             elif 'sponsorship' in label_lower or 'visa' in label_lower:
                 answer = questions_data.require_visa
+            elif 'relationship' in label_lower:
+                answer = "No"
+            elif 'applied' in label_lower:
+                answer = "No"
 
             # Find and click correct option
             found_option = self.scraper.interactor.try_xpath(f".//label[normalize-space()='{answer}']", click=False,
@@ -59,7 +63,7 @@ class RadioHandler(BaseQuestionHandler):
                 self.scraper.actions.move_to_element(found_option).click().perform()
             else:
                 possible_phrases = ["Decline", "not wish", "don't wish", "Prefer not",
-                                    "not want"] if answer == 'Decline' else [answer]
+                                    "not want", "No"] if answer == 'Decline' else [answer]
                 ele_to_click = options[0]
 
                 for phrase in possible_phrases:

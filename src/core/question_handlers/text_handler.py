@@ -75,7 +75,7 @@ class TextHandler(BaseQuestionHandler):
                         answer = questions_data.recent_employer
                     else:
                         answer = personal_data.full_name
-                elif 'notice' in label_lower:
+                elif 'notice' in label_lower or 'join new company after offer is released?' in label_lower:
                     if 'month' in label_lower:
                         answer = str(questions_data.notice_period // 30)
                     elif 'week' in label_lower:
@@ -83,7 +83,7 @@ class TextHandler(BaseQuestionHandler):
                     else:
                         answer = str(questions_data.notice_period)
                 elif 'salary' in label_lower or 'compensation' in label_lower or 'ctc' in label_lower or 'pay' in label_lower:
-                    if 'current' in label_lower or 'present' in label_lower:
+                    if 'current' in label_lower or 'present' in label_lower or "may i know your annual salary?" in label_lower:
                         if 'month' in label_lower:
                             answer = str(round(questions_data.current_ctc / 12, 2))
                         elif 'lakh' in label_lower:
@@ -99,6 +99,8 @@ class TextHandler(BaseQuestionHandler):
                             answer = str(questions_data.desired_salary)
                 elif 'linkedin' in label_lower:
                     answer = questions_data.linkedIn
+                elif 'github' in label_lower:
+                    answer = questions_data.github
                 elif 'website' in label_lower or 'blog' in label_lower or 'portfolio' in label_lower or 'link' in label_lower:
                     answer = questions_data.website
                 elif 'scale of 1–10' in label_lower:
@@ -118,6 +120,8 @@ class TextHandler(BaseQuestionHandler):
                     answer = personal_data.zipcode
                 elif 'country' in label_lower:
                     answer = personal_data.country
+                elif 'current company' in label_lower:
+                    answer = questions_data.recent_employer
 
             # 4. Fallback to AI
             if answer == "" and self.ai.is_active:
