@@ -4,6 +4,7 @@ from openai import OpenAI
 from config.secrets import secrets_data
 from src.ai.prompts import extract_skills_prompt, extract_skills_response_format, ai_answer_prompt
 from src.utils.logger import logger
+from config.questions import questions_data
 
 
 class OpenAIClient:
@@ -48,11 +49,11 @@ class OpenAIClient:
             logger.error(f"OpenAI skills extraction failed: {e}")
             return "Error extracting skills"
 
-    def answer_question(self, question: str, question_type: str, job_description: str, user_info: dict,
+    def answer_question(self, question: str, question_type: str, job_description: str,
                         options: list = None) -> str:
         logger.info(f"-- ANSWERING QUESTION using AI: {question}")
 
-        user_info_str = json.dumps(user_info, default=str)
+        user_info_str = questions_data.linkedin_summary
         prompt = ai_answer_prompt.format(user_info_str, question)
 
         # Inject Options Logic

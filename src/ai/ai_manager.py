@@ -45,13 +45,13 @@ class AIManager:
             logger.error(f"AI failed to extract skills: {e}")
             return "Error extracting skills"
 
-    def get_answer(self, question: str, question_type: str, job_description: str, user_info: dict) -> str:
+    def get_answer(self, question: str, question_type: str, job_description: str) -> str:
         if not self.is_active or not self.client:
             return ""
 
         try:
             logger.info(f"Asking AI for answer to: '{question}'")
-            answer = self.client.answer_question(question, question_type, job_description, user_info)
+            answer = self.client.answer_question(question, question_type, job_description)
             logger.debug(f"AI suggested: {answer}")
             return answer
         except Exception as e:
