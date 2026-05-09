@@ -64,20 +64,18 @@ class JobApplier:
                 questions_list.update(new_questions)
 
                 # 2. Upload resume if prompted
-                if settings_data.uploadNewResume and not uploaded: uploaded, _ = self._upload_resume(modal,
-                                                                                                     questions_data.default_resume_path)
+                if settings_data.uploadNewResume and not uploaded:
+                    uploaded, _ = self._upload_resume(modal, questions_data.default_resume_path)
 
                 # 3. Navigate forward (Try Review first, then Next)
-                review_btn = self.scraper.interactor.wait_span_click("Review", timeout=1, click=False)
+                # FIX: Set click=True so it uses your human_click() method which safely handles ElementClickInterceptedException
+                review_btn = self.scraper.interactor.wait_span_click("Review", timeout=1, click=True)
                 if review_btn:
-                    review_btn.click()
-                    next_button = False
+                    next_button = False # Successfully clicked Review, end loop
                 else:
-                    next_btn = self.scraper.interactor.wait_span_click("Next", timeout=1, click=False)
-                    if next_btn:
-                        next_btn.click()
-                    else:
-                        next_button = False
+                    next_btn = self.scraper.interactor.wait_span_click("Next", timeout=1, click=True)
+                    if not next_btn:
+                        next_button = False # Neither Review nor Next found, end loop
 
                 self.scraper.interactor.sleep_buffer(1, 2)
 
@@ -191,6 +189,10 @@ class JobApplier:
             if follow_checkbox.is_selected() != follow_preference:
                 label = modal.find_element(By.XPATH, ".//label[@for='follow-company-checkbox']")
                 self.scraper.interactor.scroll_to_view(label)
-                label.click()
+                # Safely attempt to click the label without throwing exceptions
+                try:
+                    self.scraper.interactor.human_click(label)
+                except:
+                    pass
         except:
             pass
