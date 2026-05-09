@@ -9,7 +9,7 @@ from src.core.bot_engine import BotEngine
 from src.utils.logger import logger
 
 # Import your configurations
-import config.secrets as secrets
+from config.secrets import secrets_data
 
 
 def main():
@@ -25,7 +25,7 @@ def main():
     try:
         scraper.driver.get("https://www.linkedin.com/login")
         if not scraper.is_logged_in():
-            scraper.login(secrets.username, secrets.password)
+            scraper.login(secrets_data.username, secrets_data.password)
 
         if scraper.is_logged_in(): logger.info("Login Successful!")
     except Exception:

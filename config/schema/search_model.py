@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field
 from typing import List, Literal
 
+
 class SearchModel(BaseModel):
     # Must contain at least one search term
     search_terms: List[str] = Field(..., min_length=1)
@@ -33,9 +34,10 @@ class SearchModel(BaseModel):
     in_your_network: bool = False
     fair_chance_employer: bool = False
 
+    job_title_bad_words: List[str] = []
+    job_desc_bad_words: List[str] = []
     about_company_bad_words: List[str] = []
     about_company_good_words: List[str] = []
-    bad_words: List[str] = []
 
     security_clearance: bool = False
     did_masters: bool = False

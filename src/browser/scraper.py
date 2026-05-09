@@ -24,7 +24,10 @@ class LinkedInScraper:
         self.interactor = DOMInteractor(driver, actions, wait)
 
         # Regex for extracting experience from job descriptions
-        self.re_experience = re.compile(r'[(]?\s*(\d+)\s*[)]?\s*[-to]*\s*\d*[+]*\s*year[s]?', re.IGNORECASE)
+        self.re_experience = re.compile(
+            r'(\d+)\s*(?:\+|(?:-|to|–)\s*\d+)?\s*year[s]?',
+            re.IGNORECASE
+        )
 
     def is_logged_in(self) -> bool:
         if self.driver.current_url == "https://www.linkedin.com/feed/": return True
@@ -207,7 +210,7 @@ class LinkedInScraper:
             work_style = work_location_raw[work_location_raw.rfind('(') + 1:work_location_raw.rfind(
                 ')')] if '(' in work_location_raw else "Unknown"
             work_location = work_location_raw[
-                :work_location_raw.rfind('(')].strip() if '(' in work_location_raw else work_location_raw
+                            :work_location_raw.rfind('(')].strip() if '(' in work_location_raw else work_location_raw
         except:
             company, work_location, work_style = "Unknown", "Unknown", "Unknown"
 
@@ -250,7 +253,7 @@ class LinkedInScraper:
             job_desc = job_desc_element.text
             job_desc_lower = job_desc.lower()
 
-            for word in search_data.bad_words:
+            for word in search_data.job_desc_bad_words:
                 if word.lower() in job_desc_lower:
                     return job_desc, f"Blacklisted job word found: {word}"
 
@@ -258,13 +261,41 @@ class LinkedInScraper:
                     w in job_desc_lower for w in ['polygraph', 'clearance', 'secret']):
                 return job_desc, "Requires security clearance"
 
+            import re
+
+            self.re_experience = re.compile(
+                r'(\d+)\s*(?:\+|(?:-|to|–)\s*\d+)?\s*year[s]?',
+                re.IGNORECASE
+            )
+
             # Check Experience
-            matches = re.findall(self.re_experience, job_desc)
+            matches = self.re_experience.findall(job_desc)
             if matches:
-                req_exp = max([int(m) for m in matches if int(m) <= 12])
-                masters_bonus = 2 if search_data.did_masters and 'master' in job_desc_lower else 0
-                if search_data.current_experience > -1 and req_exp > (search_data.current_experience + masters_bonus):
-                    return job_desc, f"Required experience ({req_exp}) exceeds current ({search_data.current_experience})"
+                exp_values = [
+                    int(m)
+                    for m in matches
+                    if int(m) <= 12
+                ]
+                if exp_values:
+                    req_exp = max(exp_values)
+                    masters_bonus = (
+                        2
+                        if search_data.did_masters
+                           and 'master' in job_desc.lower()
+                        else 0
+                    )
+                    allowed_exp = (
+                            search_data.current_experience
+                            + masters_bonus
+                    )
+                    if (
+                            search_data.current_experience > -1
+                            and req_exp > allowed_exp
+                    ):
+                        return (
+                            job_desc,
+                            f"Required experience ({req_exp}) exceeds current ({allowed_exp})"
+                        )
 
             return job_desc, None
 
@@ -311,7 +342,6 @@ class LinkedInScraper:
             if settings_data.close_tabs:
                 self.driver.close()
             self.driver.switch_to.window(windows[0])
-
 
     def is_already_applied(self, job_element) -> bool:
         """Safely checks if a job is already applied to without throwing exceptions."""
@@ -402,4 +432,3 @@ class LinkedInScraper:
         # Final check to see if it closed after all attempts
         if self.driver.find_elements(By.XPATH, '//div[contains(@class, "jobs-easy-apply-modal")]'):
             logger.warning("Failed to discard application after 3 attempts. It might be stuck.")
-
