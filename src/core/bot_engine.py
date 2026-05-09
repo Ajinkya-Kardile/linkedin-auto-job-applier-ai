@@ -138,16 +138,27 @@ class BotEngine:
         """Processes a single job card. Returns True if applied successfully."""
         from datetime import datetime
         if settings_data.keep_screen_awake: pyautogui.press('shiftright')
+
         details = self.scraper.extract_job_card_details(job_element)
         job_id = details.get('job_id')
+        job_title = details.get('title', 'Unknown')
+
         self.scraper.click_job_card(job_element)
 
         if job_id in self.applied_jobs or job_id in self.rejected_jobs or self.scraper.is_already_applied(
-                job_element) or details.get(
-            'company') in self.blacklisted_companies:
+                job_element) or details.get('company') in self.blacklisted_companies:
             logger.info(f"Skipping job {job_id} (Already processed/blacklisted)")
             self.skip_count += 1
             return False
+
+        # --- FIX 1: Evaluate job title against job_title_bad_words ---
+        for word in search_data.job_title_bad_words:
+            if word.lower() in job_title.lower():
+                logger.info(f"Skipping job {job_id}: Blacklisted title word found '{word}' in '{job_title}'")
+                self.rejected_jobs.add(job_id)
+                self.skip_count += 1
+                self.csv.log_failed_job({'Job ID': job_id, 'Assumed Reason': f"Blacklisted title word: {word}"})
+                return False
 
         job_desc, skip_reason = self.scraper.get_job_description_and_check_blacklist()
         if skip_reason:
@@ -192,32 +203,6 @@ class BotEngine:
                 else:
                     self.failed_count += 1
                     self.scraper.discard_application()
-            # else:
-            #     self.scraper.handle_external_apply()
-            #     self.external_jobs_count += 1
-            #     self.applied_jobs.add(job_id)
-            #     # --- NEW: Log External Jobs to the CSV ---
-            #     self.csv.log_submitted_job({
-            #         'Job ID': job_id,
-            #         'Title': details.get('title', 'Unknown'),
-            #         'Company': details.get('company', 'Unknown'),
-            #         'Work Location': details.get('work_location', 'Unknown'),
-            #         'Work Style': details.get('work_style', 'Unknown'),
-            #         'About Job': job_desc,
-            #         'Experience required': 'Unknown',
-            #         'Skills required': str(skills_required),
-            #         'HR Name': 'Unknown',
-            #         'HR Link': 'Unknown',
-            #         'Resume': 'Not Applied',
-            #         'Re-posted': False,
-            #         'Date Posted': 'Unknown',
-            #         'Date Applied': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-            #         'Job Link': f"https://www.linkedin.com/jobs/view/{job_id}",
-            #         'External Job link': 'External Application',
-            #         'Questions Found': 'None',
-            #         'Connect Request': 'N/A'
-            #     })
-
             return True
 
         except Exception as e:

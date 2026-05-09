@@ -238,19 +238,34 @@ class LinkedInScraper:
         Returns: (job_description, skip_reason). If skip_reason is None, it is safe to apply.
         """
         try:
-            # Check About Company
-            about_company_org = self.driver.find_element(By.CLASS_NAME, "jobs-company__box").text.lower()
-            skip_company_check = any(
-                word.lower() in about_company_org for word in search_data.about_company_good_words)
+            # Check About Company safely
+            try:
+                about_company_org = self.driver.find_element(By.CLASS_NAME, "jobs-company__box").text.lower()
+                skip_company_check = any(
+                    word.lower() in about_company_org for word in search_data.about_company_good_words)
 
-            if not skip_company_check:
-                for word in search_data.about_company_bad_words:
-                    if word.lower() in about_company_org:
-                        return "", f"Blacklisted company word found: {word}"
+                if not skip_company_check:
+                    for word in search_data.about_company_bad_words:
+                        if word.lower() in about_company_org:
+                            return "", f"Blacklisted company word found: {word}"
+            except Exception:
+                pass  # Company box doesn't always exist
 
-            # Check Job Description
-            job_desc_element = self.driver.find_element(By.CLASS_NAME, "jobs-box__html-content")
-            job_desc = job_desc_element.text
+            # --- FIX 2: Use textContent to ensure hidden text (See more) is read ---
+            try:
+                # Try the newest layout first
+                job_desc_element = self.driver.find_element(By.ID, "job-details")
+            except:
+                try:
+                    job_desc_element = self.driver.find_element(By.CLASS_NAME, "jobs-description-content__text")
+                except:
+                    job_desc_element = self.driver.find_element(By.CLASS_NAME, "jobs-box__html-content")
+
+            # .text truncates hidden text. .get_attribute("textContent") gets everything.
+            job_desc = job_desc_element.get_attribute("textContent")
+            if not job_desc:
+                job_desc = job_desc_element.text
+
             job_desc_lower = job_desc.lower()
 
             for word in search_data.job_desc_bad_words:
@@ -305,7 +320,7 @@ class LinkedInScraper:
 
     def click_apply_button(self) -> bool:
         """
-        Attempts to click the apply button. 
+        Attempts to click the apply button.
         Returns True if it's an Easy Apply (modal opens).
         Returns False if it's an External Apply (new tab opens).
         """
