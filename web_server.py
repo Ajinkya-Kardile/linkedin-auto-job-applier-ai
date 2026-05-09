@@ -1,3 +1,8 @@
+#  Copyright (c) 2026 Ajinkya Kardile. All rights reserved.
+#
+#  This work is licensed under the terms of the MIT license.
+#  For a copy, see <https://opensource.org/licenses/MIT>.
+
 from flask import Flask, jsonify, render_template, request
 from flask_cors import CORS
 from src.data.csv_manager import CSVManager

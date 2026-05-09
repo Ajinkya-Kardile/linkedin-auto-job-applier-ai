@@ -1,3 +1,8 @@
+#  Copyright (c) 2026 Ajinkya Kardile. All rights reserved.
+#
+#  This work is licensed under the terms of the MIT license.
+#  For a copy, see <https://opensource.org/licenses/MIT>.
+
 def truncate_for_csv(text, max_length=30000):
     """Ensures a string doesn't exceed CSV field limits."""
     if not isinstance(text, str):
