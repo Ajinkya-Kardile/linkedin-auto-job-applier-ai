@@ -5,10 +5,21 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Python-3.10%2B-blue" />
-  <img src="https://img.shields.io/badge/Automation-AI-green" />
-  <img src="https://img.shields.io/badge/Platform-LinkedIn-blue" />
-  <img src="https://img.shields.io/badge/License-MIT-orange" />
+  <a href="https://www.python.org/">
+    <img src="https://img.shields.io/badge/Python-3.10%2B-blue?logo=python&logoColor=white" />
+  </a>
+
+  <a href="https://github.com/Ajinkya-Kardile/linkedin-auto-job-applier-ai">
+    <img src="https://img.shields.io/badge/Automation-AI-green?logo=robotframework&logoColor=white" />
+  </a>
+
+  <a href="https://www.linkedin.com/in/ajinkya-kardile/">
+    <img src="https://img.shields.io/badge/Platform-LinkedIn-0A66C2?logo=linkedin&logoColor=white" />
+  </a>
+
+  <a href="./LICENSE">
+    <img src="https://img.shields.io/badge/License-MIT-orange" />
+  </a>
 </p>
 
 ---
