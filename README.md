@@ -32,6 +32,24 @@ It mimics real human behavior, avoids bot detection, and intelligently answers j
 
 ---
 
+## 🎯 Why This Project Stands Out
+
+* 🔥 Fully automated **end-to-end pipeline**
+* 🧠 AI-powered decision making
+* 🛡️ Built-in anti-detection strategies
+* ⚡ Scales to hundreds of applications
+* 📊 Real-time monitoring dashboard
+
+---
+
+## 📸 Demo
+
+<p align="center">
+  <img src="./assets/demo.gif" width="100%" />
+</p>
+
+---
+
 ## ⚙️ How It Works (End-to-End Pipeline)
 
 ### 🔐 1. Authentication & Stealth Layer
@@ -85,22 +103,6 @@ It mimics real human behavior, avoids bot detection, and intelligently answers j
 
 ---
 
-## 🎯 Why This Project Stands Out
-
-* 🔥 Fully automated **end-to-end pipeline**
-* 🧠 AI-powered decision making
-* 🛡️ Built-in anti-detection strategies
-* ⚡ Scales to hundreds of applications
-* 📊 Real-time monitoring dashboard
-
----
-
-## 📸 Demo (Optional)
-
-<p align="center">
-  <img src="./assets/demo.gif" width="100%" />
-</p>
----
 
 ## ⚡ Quick Start
 
