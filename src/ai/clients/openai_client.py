@@ -1,10 +1,12 @@
 # src/ai/clients/openai_client.py
 import json
+
 from openai import OpenAI
+
+from config.questions import questions_data
 from config.secrets import secrets_data
 from src.ai.prompts import extract_skills_prompt, extract_skills_response_format, ai_answer_prompt
 from src.utils.logger import logger
-from config.questions import questions_data
 
 
 class OpenAIClient:

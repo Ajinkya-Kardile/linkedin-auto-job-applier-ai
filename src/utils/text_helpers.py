@@ -1,4 +1,3 @@
-
 def truncate_for_csv(text, max_length=30000):
     """Ensures a string doesn't exceed CSV field limits."""
     if not isinstance(text, str):
@@ -6,6 +5,7 @@ def truncate_for_csv(text, max_length=30000):
     if len(text) > max_length:
         return text[:max_length] + "... [TRUNCATED]"
     return text
+
 
 def clean_company_name(company_string):
     """Removes extra characters often scraped alongside company names."""

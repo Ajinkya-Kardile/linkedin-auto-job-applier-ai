@@ -1,11 +1,10 @@
 # src/ai/ai_manager.py
-from src.utils.logger import logger
 from config.secrets import secrets_data
-
+from src.ai.clients.deepseek_client import DeepSeekClient
+from src.ai.clients.gemini_client import GeminiClient
 # You will move your existing logic from modules/ai/ into these client files
 from src.ai.clients.openai_client import OpenAIClient
-from src.ai.clients.gemini_client import GeminiClient
-from src.ai.clients.deepseek_client import DeepSeekClient
+from src.utils.logger import logger
 
 
 class AIManager:

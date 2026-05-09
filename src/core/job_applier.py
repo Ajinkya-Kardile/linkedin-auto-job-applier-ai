@@ -3,14 +3,14 @@ import time
 
 import pyautogui
 from selenium.webdriver.common.by import By
-from src.core.question_handlers.text_handler import TextHandler
+
+from config.questions import questions_data
+from config.settings import settings_data
+from src.core.question_handlers.checkbox_handler import CheckboxHandler
 from src.core.question_handlers.radio_handler import RadioHandler
 from src.core.question_handlers.select_handler import SelectHandler
-from src.core.question_handlers.checkbox_handler import CheckboxHandler
+from src.core.question_handlers.text_handler import TextHandler
 from src.utils.logger import logger
-from config.personal import personal_data
-from config.settings import settings_data
-from config.questions import questions_data
 
 
 class JobApplier:
@@ -71,11 +71,11 @@ class JobApplier:
                 # FIX: Set click=True so it uses your human_click() method which safely handles ElementClickInterceptedException
                 review_btn = self.scraper.interactor.wait_span_click("Review", timeout=1, click=True)
                 if review_btn:
-                    next_button = False # Successfully clicked Review, end loop
+                    next_button = False  # Successfully clicked Review, end loop
                 else:
                     next_btn = self.scraper.interactor.wait_span_click("Next", timeout=1, click=True)
                     if not next_btn:
-                        next_button = False # Neither Review nor Next found, end loop
+                        next_button = False  # Neither Review nor Next found, end loop
 
                 self.scraper.interactor.sleep_buffer(1, 2)
 

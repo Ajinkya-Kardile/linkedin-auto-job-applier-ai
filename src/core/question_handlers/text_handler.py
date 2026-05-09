@@ -3,12 +3,11 @@ import time
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-from src.core.question_handlers.base_handler import BaseQuestionHandler
-from src.utils.logger import logger
+
 from config.personal import personal_data
 from config.questions import questions_data
 from config.settings import settings_data
-
+from src.core.question_handlers.base_handler import BaseQuestionHandler
 
 
 class TextHandler(BaseQuestionHandler):

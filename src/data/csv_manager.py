@@ -2,9 +2,10 @@
 import csv
 import os
 from datetime import datetime
+
+from config.settings import settings_data
 from src.utils.logger import logger
 from src.utils.text_helpers import truncate_for_csv
-from config.settings import settings_data
 
 
 class CSVManager:

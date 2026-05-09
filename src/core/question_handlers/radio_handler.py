@@ -1,9 +1,11 @@
 # src/core/question_handlers/radio_handler.py
-from src.core.question_handlers.base_handler import BaseQuestionHandler
 from selenium.webdriver.common.by import By
+
 from config.personal import personal_data
 from config.questions import questions_data
 from config.settings import settings_data
+from src.core.question_handlers.base_handler import BaseQuestionHandler
+
 
 class RadioHandler(BaseQuestionHandler):
     def can_handle(self, question_element):

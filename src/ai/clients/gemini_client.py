@@ -1,10 +1,12 @@
 # src/ai/clients/gemini_client.py
 import json
+
 import google.generativeai as genai
+
+from config.questions import questions_data
 from config.secrets import secrets_data
 from src.ai.prompts import extract_skills_prompt, ai_answer_prompt
 from src.utils.logger import logger
-from config.questions import questions_data
 
 
 class GeminiClient:

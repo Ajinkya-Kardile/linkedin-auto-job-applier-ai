@@ -1,15 +1,14 @@
 # src/core/bot_engine.py
 import time
-import traceback
 from datetime import datetime
 
 import pyautogui
-from selenium.common.exceptions import NoSuchWindowException, WebDriverException, ElementClickInterceptedException
+from selenium.common.exceptions import NoSuchWindowException, WebDriverException
 
-from src.utils.logger import logger
-from src.core.job_applier import JobApplier
-from config.settings import settings_data
 from config.search import search_data
+from config.settings import settings_data
+from src.core.job_applier import JobApplier
+from src.utils.logger import logger
 
 
 class BotEngine:

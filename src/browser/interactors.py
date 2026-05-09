@@ -1,11 +1,12 @@
-import time
 import random
+import time
+
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.remote.webelement import WebElement
-from selenium.common.exceptions import MoveTargetOutOfBoundsException, TimeoutException
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 
 from config.settings import settings_data
 from src.utils.logger import logger
@@ -53,7 +54,6 @@ class DOMInteractor:
             # If a sticky header/footer blocks the click, force it via JavaScript
             logger.debug("Click intercepted by an overlapping element. Using JS fallback.")
             self.driver.execute_script("arguments[0].click();", element)
-
 
     def human_type(self, element: WebElement, text: str):
         """Simulates human typing with variable keystroke delays."""
@@ -120,7 +120,7 @@ class DOMInteractor:
             self.wait_span_click(span_text, 1)
             search = self.driver.find_element(By.XPATH, f'(.//input[@placeholder="{span_text}"])[1]')
             search.send_keys(Keys.CONTROL + "a")
-            self.human_type(search,search_text)
+            self.human_type(search, search_text)
             self.actions.send_keys(Keys.DOWN).perform()
             self.actions.send_keys(Keys.ENTER).perform()
             self.sleep_buffer()

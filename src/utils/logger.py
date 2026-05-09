@@ -26,10 +26,12 @@ file_handler.setFormatter(log_format)
 logger.addHandler(console_handler)
 logger.addHandler(file_handler)
 
+
 def print_lg(*args, **kwargs):
     """Backward compatibility for your old print_lg calls"""
     message = " ".join([str(arg) for arg in args])
     logger.info(message)
+
 
 def critical_error_log(context, exception):
     """Log critical errors with stack trace"""

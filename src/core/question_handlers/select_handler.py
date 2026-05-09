@@ -1,14 +1,16 @@
 # src/core/question_handlers/select_handler.py
 import random
 
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.select import Select
-from selenium.common.exceptions import NoSuchElementException
+
+from config.personal import personal_data
+from config.questions import questions_data
+from config.settings import settings_data
 from src.core.question_handlers.base_handler import BaseQuestionHandler
 from src.utils.logger import logger
-from config.questions import questions_data
-from config.personal import personal_data
-from config.settings import settings_data
+
 
 class SelectHandler(BaseQuestionHandler):
     def can_handle(self, question_element):

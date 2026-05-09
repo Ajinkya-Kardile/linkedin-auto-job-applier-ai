@@ -1,10 +1,12 @@
 # src/ai/clients/deepseek_client.py
 import json
+
 from openai import OpenAI
+
+from config.questions import questions_data
 from config.secrets import secrets_data
 from src.ai.prompts import deepseek_extract_skills_prompt, ai_answer_prompt
 from src.utils.logger import logger
-from config.questions import questions_data
 
 
 class DeepSeekClient:

@@ -1,8 +1,9 @@
 # src/browser/driver_factory.py
 import os
+
+from selenium.common.exceptions import SessionNotCreatedException
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.common.exceptions import SessionNotCreatedException
 
 from config.settings import settings_data
 from src.utils.logger import logger

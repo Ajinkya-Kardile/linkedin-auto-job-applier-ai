@@ -4,16 +4,14 @@ import time
 
 import pyautogui
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
-from selenium.common.exceptions import NoSuchElementException, ElementNotInteractableException
-
-from src.browser.interactors import DOMInteractor
-from src.utils.logger import logger
+from selenium.webdriver.support import expected_conditions as EC
 
 # Import configurations used for filtering and blacklisting
 from config.search import search_data
 from config.settings import settings_data
+from src.browser.interactors import DOMInteractor
+from src.utils.logger import logger
 
 
 class LinkedInScraper:
