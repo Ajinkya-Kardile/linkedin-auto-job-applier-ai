@@ -261,6 +261,20 @@ class LinkedInScraper:
                 except:
                     job_desc_element = self.driver.find_element(By.CLASS_NAME, "jobs-box__html-content")
 
+            # --- ADDED: Simulate Human Reading by scrolling ---
+            try:
+                # Pause to read the top, scroll to the bottom, pause, then scroll back up
+                self.interactor.sleep_buffer(0.5, 1.0)
+                self.driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'end'});",
+                                           job_desc_element)
+                self.interactor.sleep_buffer(1.5, 3.0)
+                self.driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'start'});",
+                                           job_desc_element)
+                self.interactor.sleep_buffer(0.5, 1.0)
+            except Exception as e:
+                logger.debug(f"Minor issue smoothly scrolling the job description (Safe to ignore): {e}")
+            # --------------------------------------------------
+
             # .text truncates hidden text. .get_attribute("textContent") gets everything.
             job_desc = job_desc_element.get_attribute("textContent")
             if not job_desc:
