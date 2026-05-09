@@ -97,8 +97,9 @@ It mimics real human behavior, avoids bot detection, and intelligently answers j
 
 ## 📸 Demo (Optional)
 
-> Add screenshots or GIF here for better engagement
-
+<p align="center">
+  <img src="./assets/demo.gif" width="100%" />
+</p>
 ---
 
 ## ⚡ Quick Start
