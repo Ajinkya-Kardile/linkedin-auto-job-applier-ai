@@ -335,6 +335,19 @@ class LinkedInScraper:
             logger.debug(f"Failed to extract full job description: {e}")
             return "Unknown", None
 
+    def _handle_safety_reminder(self):
+        """Checks for and dismisses the LinkedIn safety reminder popup."""
+        try:
+            # Look for the 'Continue applying' button
+            continue_btn = self.driver.find_elements(By.XPATH, "//button[contains(., 'Continue applying')]")
+            if continue_btn:
+                logger.info("Safety reminder popup detected! Clicking 'Continue applying'...")
+                # Force click via JS to bypass any overlapping elements
+                self.driver.execute_script("arguments[0].click();", continue_btn[0])
+                self.interactor.sleep_buffer(1.5, 2.5) # Give the next modal time to load
+        except Exception as e:
+            logger.debug(f"Safe to ignore: Error checking for safety reminder: {e}")
+
     def click_apply_button(self) -> bool:
         """
         Attempts to click the apply button.
@@ -344,12 +357,21 @@ class LinkedInScraper:
         is_easy_apply = self.interactor.try_xpath(
             ".//button[contains(@class,'jobs-apply-button') and contains(@class, 'artdeco-button--3') and contains(@aria-label, 'Easy')]")
 
+        # Let the UI settle for a moment
+        self.interactor.sleep_buffer(1, 2)
+
+        # --- FIX: Check for the safety reminder after clicking Easy Apply ---
+        self._handle_safety_reminder()
+
         if not is_easy_apply:
             try:
                 apply_btn = self.driver.find_element(By.XPATH, ".//button[contains(@class,'jobs-apply-button')]")
                 tabs_before = len(self.driver.window_handles)
                 apply_btn.click()
-                self.interactor.sleep_buffer(1, 3)
+                self.interactor.sleep_buffer(1, 2)
+
+                # --- FIX: Check for the safety reminder after clicking External Apply ---
+                self._handle_safety_reminder()
 
                 if len(self.driver.window_handles) > tabs_before:
                     return False  # External Apply
