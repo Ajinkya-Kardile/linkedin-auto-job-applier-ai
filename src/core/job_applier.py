@@ -105,6 +105,7 @@ class JobApplier:
                     "You submitted the application, didn't you ??", "Failed to find Submit Application!",
                     ["Yes", "No"])):
                 time.sleep(1.5)
+                self._handle_post_submit_popup()
                 self.scraper.interactor.wait_span_click("Done", timeout=3)
                 return questions_list
             else:
@@ -201,3 +202,65 @@ class JobApplier:
                     pass
         except:
             pass
+
+    def _handle_post_submit_popup(self):
+        """
+        Handles LinkedIn post-submit popups like:
+        - Update profile
+        - Not now
+        - Done
+        - Dismiss
+        """
+
+        import time
+        from selenium.webdriver.common.by import By
+
+        try:
+            time.sleep(2)
+
+            popup_buttons = self.scraper.driver.find_elements(By.TAG_NAME, "button")
+
+            for btn in popup_buttons:
+                try:
+                    text = btn.text.strip().lower()
+
+                    if text in [
+                        "not now",
+                        "done",
+                        "dismiss",
+                        "skip"
+                    ]:
+                        logger.info(f"Clicking post-submit popup button: {text}")
+
+                        self.scraper.driver.execute_script(
+                            "arguments[0].click();",
+                            btn
+                        )
+
+                        time.sleep(1.5)
+                        return True
+
+                except Exception:
+                    continue
+
+            # Fallback close button (X)
+            close_buttons = self.scraper.driver.find_elements(
+                By.XPATH,
+                "//button[contains(@aria-label,'Dismiss')]"
+            )
+
+            if close_buttons:
+                logger.info("Closing popup using dismiss button")
+
+                self.scraper.driver.execute_script(
+                    "arguments[0].click();",
+                    close_buttons[0]
+                )
+
+                time.sleep(1.5)
+                return True
+
+        except Exception as e:
+            logger.warning(f"Failed handling post-submit popup: {e}")
+
+        return False
