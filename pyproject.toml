@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "linkedin-auto-job-applier-ai"
-version = "1.0.0"
+version = "1.0.1"
 description = "An automated AI-powered job application bot for LinkedIn."
 readme = "README.md"
 requires-python = ">=3.10"
