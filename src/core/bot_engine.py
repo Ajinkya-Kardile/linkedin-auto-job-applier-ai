@@ -178,6 +178,7 @@ class BotEngine:
             is_easy_apply = self.scraper.click_apply_button()
 
             if is_easy_apply:
+                logger.info(f"Applying For Job: {job_title}")
                 questions_list = self.job_applier.execute_easy_apply_flow(job_id, job_desc)
                 if questions_list is not False:  # Flow succeeded
                     self.easy_applied_count += 1

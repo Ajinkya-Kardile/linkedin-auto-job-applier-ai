@@ -35,7 +35,7 @@ search_data = SearchModel(
                          ".NET","Microsoft", "Web", "ios", "HubSpot", "ServiceNow", "security", "Generative",
                          "Machine", "Artificial", "AI", "ML", "Share", "Infios", "Embedded", "test",
                          "cyber","power", "php", "Ruby", "QA", "Django", "flask", "fastapi", "pega", "intern", "automation",
-                         "database","GenAI", "CRM", "Quality", ],
+                         "database","GenAI", "CRM", "Quality", "Mulesoft", "Angular", "golang", "go", "SDET"],
     job_desc_bad_words=["US Citizen", "USA Citizen", "No C2C", "No Corp2Corp", ".NET", "Embedded Programming", "PHP",
                         "Ruby", "CNC"],
     about_company_bad_words=["Crossover"],

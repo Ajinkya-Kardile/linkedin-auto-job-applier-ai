@@ -91,9 +91,9 @@ class JobApplier:
             if errored != "stuck" and self.pause_before_submit:
                 decision = pyautogui.confirm(
                     '1. Please verify your information.\n2. If you edited something, please return to this final screen.\n3. DO NOT CLICK "Submit Application".\n\n\n\n\nYou can turn off "Pause before submit" setting in config.py\nTo TEMPORARILY disable pausing, click "Disable Pause"',
-                    "Confirm your information", ["Disable Pause", "Discard Application", "Submit Application"])
+                    "Confirm your information", ["Enable Auto-Submit", "Discard Application", "Submit Application"])
                 if decision == "Discard Application": raise Exception("Job application discarded by user!")
-                self.pause_before_submit = False if "Disable Pause" == decision else True
+                self.pause_before_submit = False if "Enable Auto-Submit" == decision else True
 
             ## Submit Application
             # 1. Fixed the keyword argument: scroll_top=True
