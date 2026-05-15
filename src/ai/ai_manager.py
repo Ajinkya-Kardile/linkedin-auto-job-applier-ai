@@ -7,6 +7,7 @@
 from config.secrets import secrets_data
 from src.ai.clients.deepseek_client import DeepSeekClient
 from src.ai.clients.gemini_client import GeminiClient
+from src.ai.clients.ollama_client import OllamaClient
 # You will move your existing logic from modules/ai/ into these client files
 from src.ai.clients.openai_client import OpenAIClient
 from src.utils.logger import logger
@@ -29,6 +30,8 @@ class AIManager:
                 return GeminiClient()
             elif self.provider == "deepseek":
                 return DeepSeekClient()
+            elif self.provider == "ollama":          # <-- Add this block
+                return OllamaClient()                # <--
             else:
                 logger.warning(f"Unknown AI provider '{self.provider}'. AI disabled.")
                 self.is_active = False
@@ -49,13 +52,13 @@ class AIManager:
             logger.error(f"AI failed to extract skills: {e}")
             return "Error extracting skills"
 
-    def get_answer(self, question: str, question_type: str, job_description: str) -> str:
+    def get_answer(self, question: str, question_type: str, job_description: str, options: list = None) -> str:
         if not self.is_active or not self.client:
             return ""
 
         try:
             logger.info(f"Asking AI for answer to: '{question}'")
-            answer = self.client.answer_question(question, question_type, job_description)
+            answer = self.client.answer_question(question, question_type, job_description, options)
             logger.debug(f"AI suggested: {answer}")
             return answer
         except Exception as e:

@@ -12,9 +12,9 @@ class SecretsModel(BaseModel):
     password: str = ""
 
     use_AI: bool = False
-    ai_provider: Literal["openai", "deepseek", "gemini"] = "openai"
+    ai_provider: Literal["openai", "deepseek", "gemini", "ollama"] = "openai"
     llm_api_url: str = "https://api.openai.com/v1/"
     llm_api_key: str = "not-needed"
     llm_model: str = "gpt-5-mini"
-    llm_spec: Literal["openai", "openai-like", "openai-like-github", "openai-like-mistral"] = "openai"
+    llm_spec: Literal["openai", "openai-like", "openai-like-github", "openai-like-mistral","ollama"] = "openai"
     stream_output: bool = False
